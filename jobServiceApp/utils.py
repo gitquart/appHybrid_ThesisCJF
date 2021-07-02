@@ -78,7 +78,7 @@ def readUrl(l_bot,l_top):
         if res=='m':
             print("Main program is done")
             os.sys.exit(0)
-        if res!='':
+        else:
             #Check if the record exist
             idThesis=res['id_thesis']
             heading=res['heading']
@@ -105,7 +105,7 @@ prepareThesis:
 
 def prepareThesis(id_thesis,json_thesis,browser): 
     
-    result=''
+    result=None
     strIdThesis=str(id_thesis) 
     url="https://sjf2.scjn.gob.mx/detalle/tesis/"+strIdThesis
     #"verify=False" disables SSL verification
@@ -252,7 +252,6 @@ def getCompleteDate(pub_date):
                 
     completeDate=year+'-'+month+'-'+day                   
     return completeDate
-
 
 
 def getIDLimit(sense,l_bot,l_top,period):
