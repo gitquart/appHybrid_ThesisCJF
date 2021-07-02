@@ -111,6 +111,7 @@ def prepareThesis(id_thesis,json_thesis,browser):
     result=''
     strIdThesis=str(id_thesis) 
     url="https://sjf2.scjn.gob.mx/detalle/tesis/"+strIdThesis
+    #"verify=False" disables SSL verification
     response= requests.get(url,verify=False)
     status= response.status_code
     if status==200:
