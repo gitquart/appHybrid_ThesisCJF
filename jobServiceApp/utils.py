@@ -26,17 +26,14 @@ def returnChromeSettings():
     browser=''
     chromedriver_autoinstaller.install()
     options = Options()
-    desired_capabilities = DesiredCapabilities.CHROME.copy()
-    desired_capabilities['acceptInsecureCerts'] = True
-    
-    
+
     if objControl.heroku:
         #Chrome configuration for heroku
         options.binary_location=os.environ.get("GOOGLE_CHROME_BIN")
         options.add_argument("--headless")
         options.add_argument("--disable-dev-shm-usage")
         options.add_argument("--no-sandbox") 
-        browser=webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),options=options,desired_capabilities=desired_capabilities)
+        browser=webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),options=options)
 
     else:
         
@@ -49,7 +46,7 @@ def returnChromeSettings():
                }           
 
         options.add_experimental_option("prefs", profile)
-        browser=webdriver.Chrome(options=options,desired_capabilities=desired_capabilities)  
+        browser=webdriver.Chrome(options=options)  
 
     
 
@@ -112,31 +109,24 @@ def prepareThesis(id_thesis,json_thesis,browser):
     strIdThesis=str(id_thesis) 
     url="https://sjf2.scjn.gob.mx/detalle/tesis/"+strIdThesis
     #"verify=False" disables SSL verification
-    response= requests.get(url,verify=False)
-    status= response.status_code
-    if status==200:
-        browser.get(url)
-        #30 seconds of waiting
-        time.sleep(30)
-        thesis_html = BeautifulSoup(browser.page_source, 'lxml')
-        title=thesis_html.find('title')
-        title_text=title.text
-        if strIdThesis in title_text.strip():   
-            json_full=fillJson(json_thesis,browser,strIdThesis)
-            result=json_full
-        else:
-            print('Missing thesis at ID:',strIdThesis)
-            querySt="update thesis.cjf_control set page="+strIdThesis+" where  id_control=4;"
-            db.executeNonQuery(querySt)
-            print('-------------------------------------------')
-            print('Hey, you can turn me off now!')
-            print('-------------------------------------------')
-            result='m'
-                  
+    browser.get(url)
+    #30 seconds of waiting
+    time.sleep(30)
+    thesis_html = BeautifulSoup(browser.page_source, 'lxml')
+    title=thesis_html.find('title')
+    title_text=title.text
+    if strIdThesis in title_text.strip():   
+        json_full=fillJson(json_thesis,browser,strIdThesis)
+        result=json_full
     else:
-        print('Server failure:',strIdThesis)
-        result=''
-        
+        print('Missing thesis at ID:',strIdThesis)
+        querySt="update thesis.cjf_control set page="+strIdThesis+" where  id_control=4;"
+        db.executeNonQuery(querySt)
+        print('-------------------------------------------')
+        print('Hey, you can turn me off now!')
+        print('-------------------------------------------')
+        result='m'
+                         
     return  result
 
 def clearJSON(json_thesis):
