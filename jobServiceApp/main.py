@@ -18,8 +18,6 @@ Info:
 
 """
 
-import json
-import os
 import cassandraUtil as db
 import utils as tool
 
@@ -35,7 +33,7 @@ if resultSet:
         print('Value from cassandra:',str(row[1]))
 startID=int(lsInfo[1])
 #The limits in readUrl may vary up to the need of the search
-tool.readUrl(1,startID,5000000)  
+tool.readUrl(startID,5000000)  
 
   
 

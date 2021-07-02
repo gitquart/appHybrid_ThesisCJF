@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import time
 from InternalControl import cInternalControl
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 objControl=cInternalControl()
 
@@ -24,18 +25,21 @@ thesis_added=False
 def returnChromeSettings():
     browser=''
     chromedriver_autoinstaller.install()
+    options = Options()
+    desired_capabilities = DesiredCapabilities.CHROME.copy()
+    desired_capabilities['acceptInsecureCerts'] = True
+    
+    
     if objControl.heroku:
         #Chrome configuration for heroku
-        chrome_options= webdriver.ChromeOptions()
-        chrome_options.binary_location=os.environ.get("GOOGLE_CHROME_BIN")
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--no-sandbox")
-
-        browser=webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),chrome_options=chrome_options)
+        options.binary_location=os.environ.get("GOOGLE_CHROME_BIN")
+        options.add_argument("--headless")
+        options.add_argument("--disable-dev-shm-usage")
+        options.add_argument("--no-sandbox") 
+        browser=webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"),options=options,desired_capabilities=desired_capabilities)
 
     else:
-        options = Options()
+        
         profile = {"plugins.plugins_list": [{"enabled": True, "name": "Chrome PDF Viewer"}], # Disable Chrome's PDF Viewer
                "download.default_directory": objControl.download_dir , 
                "download.prompt_for_download": False,
@@ -45,7 +49,7 @@ def returnChromeSettings():
                }           
 
         options.add_experimental_option("prefs", profile)
-        browser=webdriver.Chrome(options=options)  
+        browser=webdriver.Chrome(options=options,desired_capabilities=desired_capabilities)  
 
     
 
@@ -58,12 +62,11 @@ readUrl
 Reads the url from the jury web site
 """
 
-def readUrl(sense,l_bot,l_top):
+def readUrl(l_bot,l_top):
     
     res=''
     #Can use noTesis as test variable too
     browser=returnChromeSettings()
-    noTesis=0
     print('Starting process...')
     #Import JSON file  
     if objControl.heroku:   
@@ -108,7 +111,7 @@ def prepareThesis(id_thesis,json_thesis,browser):
     result=''
     strIdThesis=str(id_thesis) 
     url="https://sjf2.scjn.gob.mx/detalle/tesis/"+strIdThesis
-    response= requests.get(url)
+    response= requests.get(url,verify=False)
     status= response.status_code
     if status==200:
         browser.get(url)
