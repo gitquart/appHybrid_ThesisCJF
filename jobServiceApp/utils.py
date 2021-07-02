@@ -91,7 +91,7 @@ def readUrl(l_bot,l_top):
                 res=db.insertJSON(res)  
                 if res:
                     print('Thesis ready ID: ',x) 
-                    querySt="update thesis.cjf_control set page="+str(x)+" where  id_control=4;"
+                    querySt=f"update thesis.cjf_control set page={str(x)} where  id_control={str(objControl.idControl)};"
                     db.executeNonQuery(querySt)                  
     browser.quit()  
     
@@ -120,7 +120,7 @@ def prepareThesis(id_thesis,json_thesis,browser):
         result=json_full
     else:
         print('Missing thesis at ID:',strIdThesis)
-        querySt="update thesis.cjf_control set page="+strIdThesis+" where  id_control=4;"
+        querySt=f"update thesis.cjf_control set page={strIdThesis} where  id_control={str(objControl.idControl)};"
         db.executeNonQuery(querySt)
         print('-------------------------------------------')
         print('Hey, you can turn me off now!')

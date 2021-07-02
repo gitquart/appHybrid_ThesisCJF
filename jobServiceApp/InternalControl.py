@@ -1,7 +1,7 @@
 import os
 
 class cInternalControl:
-    idControl=9
+    idControl=4
     timeout=70
     hfolder='jobServiceApp' 
     heroku=True
