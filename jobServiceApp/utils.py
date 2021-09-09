@@ -1,5 +1,5 @@
-import cassandraUtil as db
-import json
+import cassandraUtil as db_cassandra
+import postgresql as db_postrgresql
 import os
 from selenium import webdriver
 import chromedriver_autoinstaller
@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import time
 from InternalControl import cInternalControl
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+import json
 
 objControl=cInternalControl()
 
@@ -70,7 +70,7 @@ def readUrl(l_bot,l_top):
         json_thesis=devuelveJSON(objControl.rutaHeroku+'thesis_json_base.json')  
     else:
         json_thesis=devuelveJSON(objControl.rutaLocal+'thesis_json_base.json')
-
+    #Import JSON file  
     for x in range(l_bot,l_top):
         print('Current thesis:',str(x))
         res=prepareThesis(x,json_thesis,browser)
@@ -82,17 +82,25 @@ def readUrl(l_bot,l_top):
             #Check if the record exist
             idThesis=res['id_thesis']
             heading=res['heading']
-            querySt="select id_thesis from thesis.tbthesis where id_thesis="+str(idThesis)+" and heading='"+heading+"'"
-            resultSet=db.getQuery(querySt)
-            if resultSet:
-                pass
-            else:
-                #Insert JSON
-                res=db.insertJSON(res)  
-                if res:
+            querySt=f"select id_thesis from tbthesis where id_thesis={str(idThesis)} and heading='{heading}'"
+            resultSet=db_postrgresql.getQuery(querySt)
+            if len(resultSet)==0:
+                #If resultSet length is 0, then the thesis is not stored yet, hence add it to table
+                #Build the postgresql statement based on JSON
+                #START - BUILD SQL STATEMENT FOR INSERT
+                #Get all the keys (fields) of JSON file
+                lsField=list()
+                for item in res:
+                    lsField.append(res.keys())
+                st='insert into tbthesis () values ()'
+                #END - BUILD SQL STATEMENT FOR INSERT
+                resInsert=None
+                resInsert=db_postrgresql.executeNonQuery(resInsert) 
+                if resInsert:
                     print('Thesis ready ID: ',x) 
                     querySt=f"update thesis.cjf_control set page={str(x)} where  id_control={str(objControl.idControl)};"
-                    db.executeNonQuery(querySt)                  
+                    db_cassandra.executeNonQuery(querySt) 
+                                 
     browser.quit()  
     
     return 'It is all done'
@@ -121,7 +129,7 @@ def prepareThesis(id_thesis,json_thesis,browser):
     else:
         print('Missing thesis at ID:',strIdThesis)
         querySt=f"update thesis.cjf_control set page={strIdThesis} where  id_control={str(objControl.idControl)};"
-        db.executeNonQuery(querySt)
+        db_cassandra.executeNonQuery(querySt)
         print('-------------------------------------------')
         print('Hey, you can turn me off now!')
         print('-------------------------------------------')
@@ -226,7 +234,7 @@ def fillJson(json_thesis,browser,strIdThesis):
     #Precedent
     val=devuelveElemento('//*[@id="divPrecedente"]',browser).text
     val=val.replace("'",'').strip() 
-    json_thesis['lst_precedents'].append(val)
+    json_thesis['lst_precedents']=val
 
 
 
