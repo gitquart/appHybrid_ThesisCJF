@@ -86,20 +86,30 @@ def readUrl(l_bot,l_top):
                 #If resultSet length is 0, then the thesis is not stored yet, hence add it to table
                 #Build the postgresql statement based on JSON
                 #START - BUILD SQL STATEMENT FOR INSERT
-                #Get all the keys (fields) of JSON file
+                #Get all the keys and values (fields and data) of JSON file
                 lsField=list()
-                for item in res:
-                    lsField.append(res.keys())
-                st='insert into tbthesis () values ()'
+                lsValue=list() 
+                for key,value in res.items():
+                    lsField.append(key)
+                    if key == 'id_thesis' or key =='period_number' or key =='multiple_subjects':
+                        lsValue.append(str(value))
+                    else:
+                        lsValue.append("'"+value+"'")    
+                st=f"insert into tbthesis ({','.join(lsField)}) values ({','.join(lsValue)})"
                 #END - BUILD SQL STATEMENT FOR INSERT
                 resInsert=None
-                resInsert=db_postrgresql.executeNonQuery(resInsert) 
+                resInsert=db_postrgresql.executeNonQuery(st) 
                 if resInsert:
                     print('Thesis ready ID: ',x) 
-                    querySt=f"update cjf_control set page={str(x)} where  id_control={str(objControl.idControl)};"
-                    db_postrgresql.executeNonQuery(querySt) 
             else:
-                print(f'Thesis ID {str(idThesis)} already in database')        
+                print(f'Thesis ID {str(x)} already in database')   
+
+            #Every thesis sould be recorded to keep the track    
+            querySt=f"update cjf_control set page={str(x)} where  id_control={str(objControl.idControl)};"
+            resUpdate=None
+            resUpdate=db_postrgresql.executeNonQuery(querySt)
+            if resUpdate:
+                print(f'ID thesis updated in table control with:{str(x)}')          
                                  
     browser.quit()  
     
