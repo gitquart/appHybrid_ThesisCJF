@@ -26,12 +26,11 @@ print('Running program...')
 querySt=f"select query,page from cjf_control where id_control={str(objControl.idControl)}"
 resultSet=db.getQuery(querySt)
 lsInfo=[]
-if resultSet: 
-    for row in resultSet:
-        lsInfo.append(str(row[0]))
-        lsInfo.append(str(row[1]))
-        print(f'App: {str(row[0])}')
-        print(f'Thesis ID: {str(row[1])}')
+if len(resultSet)>0: 
+    lsInfo.append(str(resultSet[0][0]))
+    lsInfo.append(str(resultSet[0][1]))
+    print(f'App: {str(lsInfo[0])}')
+    print(f'Thesis ID: {str(lsInfo[1])}')
 startID=int(lsInfo[1])
 #The limits in readUrl may vary up to the need of the search
 tool.readUrl(startID,5000000)  

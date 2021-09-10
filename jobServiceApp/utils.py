@@ -1,4 +1,3 @@
-import cassandraUtil as db_cassandra
 import postgresql as db_postrgresql
 import os
 from selenium import webdriver
@@ -60,7 +59,6 @@ Reads the url from the jury web site
 """
 
 def readUrl(l_bot,l_top):
-    
     res=''
     #Can use noTesis as test variable too
     browser=returnChromeSettings()
@@ -98,8 +96,8 @@ def readUrl(l_bot,l_top):
                 resInsert=db_postrgresql.executeNonQuery(resInsert) 
                 if resInsert:
                     print('Thesis ready ID: ',x) 
-                    querySt=f"update thesis.cjf_control set page={str(x)} where  id_control={str(objControl.idControl)};"
-                    db_cassandra.executeNonQuery(querySt) 
+                    querySt=f"update cjf_control set page={str(x)} where  id_control={str(objControl.idControl)};"
+                    db_postrgresql.executeNonQuery(querySt) 
                                  
     browser.quit()  
     
@@ -112,14 +110,15 @@ prepareThesis:
 """
 
 def prepareThesis(id_thesis,json_thesis,browser): 
-    
     result=None
     strIdThesis=str(id_thesis) 
     url="https://sjf2.scjn.gob.mx/detalle/tesis/"+strIdThesis
     #"verify=False" disables SSL verification
     browser.get(url)
+    secsWait=30
     #30 seconds of waiting
-    time.sleep(30)
+    print(f'Waiting {str(secsWait)} secs to avoid website detection...')
+    time.sleep(secsWait)
     thesis_html = BeautifulSoup(browser.page_source, 'lxml')
     title=thesis_html.find('title')
     title_text=title.text
@@ -128,8 +127,8 @@ def prepareThesis(id_thesis,json_thesis,browser):
         result=json_full
     else:
         print('Missing thesis at ID:',strIdThesis)
-        querySt=f"update thesis.cjf_control set page={strIdThesis} where  id_control={str(objControl.idControl)};"
-        db_cassandra.executeNonQuery(querySt)
+        querySt=f"update cjf_control set page={strIdThesis} where  id_control={str(objControl.idControl)};"
+        db_postrgresql.executeNonQuery(querySt)
         print('-------------------------------------------')
         print('Hey, you can turn me off now!')
         print('-------------------------------------------')
@@ -139,7 +138,7 @@ def prepareThesis(id_thesis,json_thesis,browser):
 
 def clearJSON(json_thesis):
     json_thesis['id_thesis']=''
-    json_thesis['lst_precedents'].clear()
+    json_thesis['lst_precedents']=''
     json_thesis['thesis_number']=''
     json_thesis['instance']=''
     json_thesis['source']=''
@@ -201,6 +200,8 @@ def fillJson(json_thesis,browser,strIdThesis):
         json_thesis['period_number']=9
     if val.strip()=='Décima Época':
         json_thesis['period_number']=10
+    if val.strip()=='Undécima Época':
+        json_thesis['period_number']=11    
 
     val=''
     val=devuelveElemento('//*[@id="divStickyTbody"]/div[3]/div[3]/p',browser).text
