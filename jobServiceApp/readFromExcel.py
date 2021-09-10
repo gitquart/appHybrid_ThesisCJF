@@ -2,7 +2,6 @@ import pandas as pd
 import postgresql as db
 
 
-
 directory='C:\\Users\\1098350515\\Documents\\thesis_postgresql\\Thesis\\'
 excel_name='tbThesis_6_sep_2021_5_PERIOD_copy'
 excel=excel_name+'.xlsx'
