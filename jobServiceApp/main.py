@@ -17,13 +17,13 @@ Info:
 2)30 secs for every read
 
 """
-import cassandraUtil as db
+import postgresql as db
 import utils as tool
 from InternalControl import cInternalControl
 objControl=cInternalControl()
 
 print('Running program...')
-querySt=f"select query,page from thesis.cjf_control where id_control={str(objControl.idControl)}  ALLOW FILTERING"
+querySt=f"select query,page from cjf_control where id_control={str(objControl.idControl)}"
 resultSet=db.getQuery(querySt)
 lsInfo=[]
 if resultSet: 
