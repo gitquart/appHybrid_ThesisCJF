@@ -98,6 +98,8 @@ def readUrl(l_bot,l_top):
                     print('Thesis ready ID: ',x) 
                     querySt=f"update cjf_control set page={str(x)} where  id_control={str(objControl.idControl)};"
                     db_postrgresql.executeNonQuery(querySt) 
+            else:
+                print(f'Thesis ID {str(idThesis)} already in database')        
                                  
     browser.quit()  
     
