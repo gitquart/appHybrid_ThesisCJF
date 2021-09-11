@@ -158,6 +158,7 @@ def clearJSON(json_thesis):
     json_thesis['publication_date']='' 
     json_thesis['dt_publication_date']=''
     json_thesis['period']=''
+    json_thesis['period_number']=''
     json_thesis['page']=''
     json_thesis['jurisprudence_type']=''
     json_thesis['type_of_thesis']=''
