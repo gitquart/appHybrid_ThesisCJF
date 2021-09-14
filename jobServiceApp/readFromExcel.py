@@ -1,5 +1,6 @@
 import pandas as pd
 import postgresql as db
+import time
 
 
 directory='C:\\Users\\1098350515\\Documents\\thesis_postgresql\\Thesis\\'
@@ -68,6 +69,7 @@ for index,row in excelDF.iterrows():
         if res:     
             rowCount+=1
             print(f'Row done {str(rowCount)} . ID {str(lsValue[3])}')  
+            
         else:
             print('Something went wrong')   
 
