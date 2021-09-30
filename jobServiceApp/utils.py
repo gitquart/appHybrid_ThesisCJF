@@ -149,7 +149,7 @@ def prepareThesis(id_thesis,json_thesis,browser):
     return  result
 
 def clearJSON(json_thesis):
-    json_thesis['id_thesis']=''
+    json_thesis['id_thesis']=0
     json_thesis['lst_precedents']=''
     json_thesis['thesis_number']=''
     json_thesis['instance']=''
@@ -158,7 +158,7 @@ def clearJSON(json_thesis):
     json_thesis['publication_date']='' 
     json_thesis['dt_publication_date']=''
     json_thesis['period']=''
-    json_thesis['period_number']=''
+    json_thesis['period_number']=0
     json_thesis['page']=''
     json_thesis['jurisprudence_type']=''
     json_thesis['type_of_thesis']=''
